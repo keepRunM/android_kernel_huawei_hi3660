@@ -292,12 +292,12 @@ static int subfunc_post_setup_trampoline(struct oases_patch_entry *patch, struct
 	memcpy(trampoline, &oases_handler_subfunc_post_start,
 		&oases_handler_subfunc_post_end - &oases_handler_subfunc_post_start);
 	/* filter_addr */
-	*((u64 *)(trampoline + SUBFUNC_POST_FILTER_ADDR_OFFSET)) = (u64)(insn->handler);
+	*((u64 *)(trampoline + 140)) = (u64)(insn->handler);
 	/* orig_addr */
-	*((u64 *)(trampoline + SUBFUNC_POST_ORIGIN_ADDR_OFFSET)) = (u64)(kp->sub);
+	*((u64 *)(trampoline + 132)) = (u64)(kp->sub);
 	/* attack logger */
-	*((u64 *)(trampoline + SUBFUNC_POST_PATCH_INFO_CTX_OFFSET)) = (u64)(kp_owner(patch));
-	*((u64 *)(trampoline + SUBFUNC_POST_ATTACK_LOGGER_OFFSET)) = (u64)(oases_attack_logger);
+	*((u64 *)(trampoline + 148)) = (u64)(kp_owner(patch));
+	*((u64 *)(trampoline + 156)) = (u64)(oases_attack_logger);
 	return 0;
 }
 
