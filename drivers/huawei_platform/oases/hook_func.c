@@ -196,12 +196,12 @@ static int func_post_setup_trampoline(struct oases_patch_entry *patch, struct oa
     memcpy(trampoline, &oases_handler_func_post_start,
         &oases_handler_func_post_end - &oases_handler_func_post_start);
 	/* NOP */
-    *((u32 *)(trampoline + FUNC_POST_PLACE_HOLDER_OFFSET)) = 0xAA0003E0;
-    *((u64 *)(trampoline + FUNC_POST_FILTER_ADDR_OFFSET)) = (u64)(insn->handler);
-    *((u64 *)(trampoline + FUNC_POST_ORIGIN_ADDR_OFFSET)) = (u64)(insn->address + 4);
-    *((u64 *)(trampoline + FUNC_POST_PATCH_INFO_CTX_OFFSET)) = (u64)(kp_owner(patch));
-    *((u64 *)(trampoline + FUNC_POST_ATTACK_LOGGER_OFFSET)) = (u64)(oases_attack_logger);
-    oases_relocate_insn(insn, FUNC_POST_PLACE_HOLDER_OFFSET);
+    *((u32 *)(trampoline + ##FUNC_POST_PLACE_HOLDER_OFFSET)) = 0xAA0003E0;
+    *((u64 *)(trampoline + ##FUNC_POST_FILTER_ADDR_OFFSET)) = (u64)(insn->handler);
+    *((u64 *)(trampoline + ##FUNC_POST_ORIGIN_ADDR_OFFSET)) = (u64)(insn->address + 4);
+    *((u64 *)(trampoline + ##FUNC_POST_PATCH_INFO_CTX_OFFSET)) = (u64)(kp_owner(patch));
+    *((u64 *)(trampoline + ##FUNC_POST_ATTACK_LOGGER_OFFSET)) = (u64)(oases_attack_logger);
+    oases_relocate_insn(insn, ##FUNC_POST_PLACE_HOLDER_OFFSET);
 	return 0;
 }
 
