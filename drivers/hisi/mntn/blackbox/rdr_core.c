@@ -84,7 +84,8 @@ void rdr_register_system_error(u32 modid, u32 arg1, u32 arg2)
 void rdr_system_error(u32 modid, u32 arg1, u32 arg2)
 {
 	char *modid_str = NULL;
-	printk_level_setup(LOGLEVEL_DEBUG);
+	
+	(LOGLEVEL_DEBUG);
 	BB_PRINT_START();
 	if (in_atomic() || irqs_disabled() || in_irq()) {
 		BB_PRINT_ERR("%s: in atomic or irqs disabled or in irq\n",
@@ -97,13 +98,11 @@ void rdr_system_error(u32 modid, u32 arg1, u32 arg2)
 	if (!rdr_init_done()) {
 		BB_PRINT_ERR("rdr init faild!\n");
 		BB_PRINT_END();
-		printk_level_setup(sysctl_printk_level);
 		return;
 	}
 	rdr_register_system_error(modid, arg1, arg2);
 	up(&rdr_sem);
 	BB_PRINT_END();
-	printk_level_setup(sysctl_printk_level);
 	return;
 }
 
@@ -144,7 +143,6 @@ void rdr_syserr_process_for_ap(u32 modid, u64 arg1, u64 arg2)
 	rdr_notify_module_reset(modid, p_exce_info);
 
 	preempt_enable();
-	printk_level_setup(sysctl_printk_level);
 	BB_PRINT_END();
 	return;
 }
@@ -179,8 +177,8 @@ void rdr_module_dump(struct rdr_exception_info_s *p_exce_info, char *path, u32 m
 
 	BB_PRINT_DBG("rdr_notify_module_dump done. return mask=[0x%x]\n", mask);
 
-	/* maskµÄÖµÊÇ¸ù¾Ýp_exce_info->e_notify_core_mask»ñµÃµÄ,
-	 * µ±maskÎª0Ê±, ²»×ßRDR¿ò¼Üµ¼³öLOGµÄÁ÷³Ì. È·ÈÏÈË:Áõº£Áú
+	/* maskçš„å€¼æ˜¯æ ¹æ®p_exce_info->e_notify_core_maskèŽ·å¾—çš„,
+	 * å½“maskä¸º0æ—¶, ä¸èµ°RDRæ¡†æž¶å¯¼å‡ºLOGçš„æµç¨‹. ç¡®è®¤äºº:åˆ˜æµ·é¾™
 	 */
 	if (mask != 0) {
 		while (wait_dumplog_timeout > 0) {
@@ -214,19 +212,19 @@ void rdr_module_dump(struct rdr_exception_info_s *p_exce_info, char *path, u32 m
 			if (mask != RDR_HIFI)
 				rdr_save_cur_baseinfo(path);
 
-			/* Èç¹ûÕâ´ÎÒì³£ÐèÒª¸´Î»È«ÏµÍ³£¬Ôò±íÊ¾log±£´æ»¹Î´Íê³É */
+			/* å¦‚æžœè¿™æ¬¡å¼‚å¸¸éœ€è¦å¤ä½å…¨ç³»ç»Ÿï¼Œåˆ™è¡¨ç¤ºlogä¿å­˜è¿˜æœªå®Œæˆ */
 			if ((p_exce_info->e_reset_core_mask & RDR_AP) &&
 				need_save_mntndump_log(p_exce_info->e_exce_type)) {
-				/* ¸´Î»ÖØÆôºó»¹ÓÐÒ»²¿·ÖlogÐèÒª±£´æ */
+				/* å¤ä½é‡å¯åŽè¿˜æœ‰ä¸€éƒ¨åˆ†logéœ€è¦ä¿å­˜ */
 				bbox_save_done(path, BBOX_SAVE_STEP1);
 			} else {
-				/* ´ËÒì³£Ä¿Â¼ÏÂµÄËùÓÐlog¶¼±£´æÍê±Ï */
+				/* æ­¤å¼‚å¸¸ç›®å½•ä¸‹çš„æ‰€æœ‰logéƒ½ä¿å­˜å®Œæ¯• */
 				bbox_save_done(path, BBOX_SAVE_STEP_DONE);
 			}
 
 			if (!in_atomic() && !irqs_disabled()
 				&& !in_irq()) {
-				/* È·±£Ö®Ç°µÄËùÓÐÎÄ¼þÏµÍ³Ïà¹Ø²Ù×÷¶¼ÄÜÍê³É */
+				/* ç¡®ä¿ä¹‹å‰çš„æ‰€æœ‰æ–‡ä»¶ç³»ç»Ÿç›¸å…³æ“ä½œéƒ½èƒ½å®Œæˆ */
 				sys_sync();
 			}
 		}
@@ -271,7 +269,7 @@ void rdr_syserr_process(struct rdr_syserr_param_s *p)
 		return;
 	}
 
-	/*Èç¹û´Ë´ÎÒì³£ÐèÒª¸´Î»È«ÏµÍ³£¬ÔòÐèÒªÏòpmu¼Ä´æÆ÷ÖÐ¼ÇÂ¼¸´Î»Ô­Òò£¬·ñÔòÖ»Ð´Èëhistory.logÖÐ */
+	/*å¦‚æžœæ­¤æ¬¡å¼‚å¸¸éœ€è¦å¤ä½å…¨ç³»ç»Ÿï¼Œåˆ™éœ€è¦å‘pmuå¯„å­˜å™¨ä¸­è®°å½•å¤ä½åŽŸå› ï¼Œå¦åˆ™åªå†™å…¥history.logä¸­ */
 	if (p_exce_info->e_reset_core_mask & RDR_AP) {
 		record_exce_type(p_exce_info);
 	}
@@ -408,7 +406,7 @@ static int rdr_main_thread_body(void *arg)
 					    ("invalid prio[%d], current modid [0x%x]\n",
 					     p_exce_info->e_process_priority,
 					     e_cur->modid);
-				/* ²éÕÒÁ´±íÖÐËùÓÐÒÑ½ÓÊÕÒì³£ÖÐ´¦ÀíÓÅÏÈ¼¶×î¸ßµÄÒ»¸ö */
+				/* æŸ¥æ‰¾é“¾è¡¨ä¸­æ‰€æœ‰å·²æŽ¥æ”¶å¼‚å¸¸ä¸­å¤„ç†ä¼˜å…ˆçº§æœ€é«˜çš„ä¸€ä¸ª */
 				if (p_exce_info->e_process_priority < e_priority) {
 					BB_PRINT_DBG
 					    ("current prio[%d], current modid [0x%x]\n",
@@ -431,7 +429,6 @@ static int rdr_main_thread_body(void *arg)
 
 			printk_level_setup(LOGLEVEL_DEBUG);
 			rdr_syserr_process(e_process);
-			printk_level_setup(sysctl_printk_level);
 
 			kfree(e_process);
 
